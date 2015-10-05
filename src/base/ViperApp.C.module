@@ -1,0 +1,51 @@
+#include "ViperApp.h"
+#include "Moose.h"
+#include "AppFactory.h"
+
+template<>
+InputParameters validParams<ViperApp>()
+{
+  InputParameters params = validParams<MooseApp>();
+
+  params.set<bool>("use_legacy_uo_initialization") = false;
+  params.set<bool>("use_legacy_uo_aux_computation") = false;
+  return params;
+}
+
+ViperApp::ViperApp(const std::string & name, InputParameters parameters) :
+    MooseApp(name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  ViperApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  ViperApp::associateSyntax(_syntax, _action_factory);
+}
+
+ViperApp::~ViperApp()
+{
+}
+
+// External entry point for dynamic application loading
+extern "C" void ViperApp__registerApps() { ViperApp::registerApps(); }
+void
+ViperApp::registerApps()
+{
+  registerApp(ViperApp);
+}
+
+// External entry point for dynamic object registration
+extern "C" void ViperApp__registerObjects(Factory & factory) { ViperApp::registerObjects(factory); }
+void
+ViperApp::registerObjects(Factory & factory)
+{
+}
+
+// External entry point for dynamic syntax association
+extern "C" void ViperApp__associateSyntax(Syntax & syntax, ActionFactory & action_factory) { ViperApp::associateSyntax(syntax, action_factory); }
+void
+ViperApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+}
